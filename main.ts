@@ -30,6 +30,11 @@ function validateEntry(text: string): void {
   if (text.trim().length === 0) {
     throw new Error("entry must not be only whitespace");
   }
+  // No leading or trailing whitespace: a commit subject line must
+  // not start or end with whitespace.
+  if (text !== text.trim()) {
+    throw new Error("entry must not have leading or trailing whitespace");
+  }
 }
 
 function main(): void {
@@ -38,7 +43,9 @@ function main(): void {
   const outDir = process.argv[2] ?? process.env.ENTRY_OUTPUT_DIR ?? "/output";
   validateEntry(ENTRY);
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, "entry.txt"), ENTRY, "utf8");
+  const outPath = join(outDir, "entry.txt");
+  writeFileSync(outPath, ENTRY, "utf8");
+  console.log(`wrote ${outPath} (${ENTRY.length} characters)`);
 }
 
 main();
